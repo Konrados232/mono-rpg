@@ -1,5 +1,8 @@
 using Microsoft.Xna.Framework;
 
+using System;
+
+
 namespace MonoRPG
 {
 	public class Camera
@@ -9,6 +12,7 @@ namespace MonoRPG
 		
 		public Vector2 Position { get; set; }
 		public Vector2 Origin { get; set; }
+		public Vector2 OffsetFromOrigin { get; set; }
 		
 		public Camera()
 		{
@@ -21,6 +25,7 @@ namespace MonoRPG
 		public void MoveCamera(Vector2 movePosition) 
 		{
 			Position += movePosition;
+			OffsetFromOrigin = Origin + Position;
 		}
 		
 		public Matrix GetTransformMatrix() 

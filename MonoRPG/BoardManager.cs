@@ -35,5 +35,24 @@ namespace MonoRPG
 			}
 		}
 		
+		public Tile GetTileFromTranslatedMousePosition(Vector2 translatedMousePosition) 
+		{
+			if (IsOutsideBounds(translatedMousePosition)) 
+			{
+				return null;
+			}
+			
+			int xTile = (int)(translatedMousePosition.X / 100);
+			int yTile = (int)(translatedMousePosition.Y / 100);
+			
+			return Board[xTile, yTile];
+		
+			bool IsOutsideBounds(Vector2 translatedMousePosition) 
+			{
+				return (translatedMousePosition.X < 0 || translatedMousePosition.X > _realWidth)
+						 || (translatedMousePosition.Y < 0 || translatedMousePosition.Y > _realHeight);
+			}
+		}
+		
 	}
 }

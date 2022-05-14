@@ -16,30 +16,32 @@ namespace MonoRPG
 		private const int SCREEN_HEIGHT = 900;
 
 		// sprites
-		Texture2D baseTile;
+		Texture2D baseSprite;
 		
 		// fonts
 		SpriteFont gameFont;
 		
-		Vector2 targetPosition = new Vector2(300,300);
+		// 
 		MouseState mouseState;
+		Vector2 translatedMousePos = Vector2.Zero;
+		
 		int score = 0;
 		
-		
+		private Tile _baseTile;
 		public Camera Camera { get; set; }
 		
+		public BoardManager BoardManager { get; set; }
 		
 		public Game1()
 		{
 			_graphicsDeviceManager = new GraphicsDeviceManager(this);
-			Camera = new Camera();
 			Content.RootDirectory = "Content";
+			Camera = new Camera();
 			IsMouseVisible = true;			
 		}
 
 		protected override void Initialize()
 		{
-			// TODO: Add your initialization logic here
 			_graphicsDeviceManager.IsFullScreen = false;
 			_graphicsDeviceManager.PreferredBackBufferWidth = SCREEN_WIDTH;
 			_graphicsDeviceManager.PreferredBackBufferHeight = SCREEN_HEIGHT;			
@@ -52,13 +54,52 @@ namespace MonoRPG
 		{
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			baseTile = Content.Load<Texture2D>("BaseTile");	
+			baseSprite = Content.Load<Texture2D>("BaseTile");
 			
 			gameFont = Content.Load<SpriteFont>("galleryFont");		
+						
+			_baseTile = new Tile(baseSprite, new Rectangle(0, 0, 100, 100), Color.White);
+			BoardManager = new BoardManager(20, 20, _baseTile);
+			
 		}
 
+		private bool IsOutsideBounds(Point mousePos) 
+		{
+			return (mousePos.X < 0 || mousePos.X > SCREEN_WIDTH)
+						|| (mousePos.Y < 0 || mousePos.Y > SCREEN_HEIGHT);
+
+		}
+		
+		private void TranslateMousePosition(Vector2 screenMousePosition, Vector2 cameraOffset) 
+		{
+			translatedMousePos.X = screenMousePosition.X + cameraOffset.X;
+			translatedMousePos.Y = screenMousePosition.Y + cameraOffset.Y;
+		}
+		
 		protected override void Update(GameTime gameTime)
 		{
+			mouseState = Mouse.GetState();
+			
+			if (mouseState.LeftButton == ButtonState.Pressed && !IsOutsideBounds(mouseState.Position))
+			{
+				Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
+				TranslateMousePosition(mousePos, Camera.OffsetFromOrigin);
+				
+				var chosenTile = BoardManager.GetTileFromTranslatedMousePosition(translatedMousePos);
+				
+				if (chosenTile != null)
+				{
+					chosenTile.Color = Color.BlueViolet;
+				}
+			}
+			
+			
+			if (mouseState.LeftButton == ButtonState.Pressed) 
+			{
+				score++;
+			}
+			
+			
 			if (Keyboard.GetState().IsKeyDown(Keys.D))
 			{
 				Camera.MoveCamera(new Vector2(10, 0));
@@ -81,49 +122,42 @@ namespace MonoRPG
 			
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
-				
-				
-			mouseState = Mouse.GetState();
-			
-			
-			if (mouseState.LeftButton == ButtonState.Pressed) 
-			{
-				score++;
-			}
-			
-		
+
 			
 
 			base.Update(gameTime);
 		}
-
-		private readonly int _tileSize = 100;
 		
 		protected override void Draw(GameTime gameTime)
 		{
 			_graphicsDeviceManager.GraphicsDevice.Clear(Color.CornflowerBlue);			
 			
-			
+			// game
 			_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
 								null, null, null, null, Camera.GetTransformMatrix());
 			
-			for (int i = 0; i < 20; i++)
+			foreach (var tile in BoardManager.Board)
 			{
-				for (int j = 0; j < 20; j++)
-				{
-					_spriteBatch.Draw(baseTile, new Rectangle(i * _tileSize, j * _tileSize, _tileSize, _tileSize), Color.White);
-				}
+				_spriteBatch.Draw(tile.Sprite, tile.Box, tile.Color);
 			}
 			
+			_spriteBatch.Draw(baseSprite, new Rectangle(-2 * 100, -2 * 100, 100, 100), Color.White);
 					
+			_spriteBatch.End();
+			
+			
+			// UI
+			_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
+								null, null, null, null, null);
+								
 			_spriteBatch.DrawString(gameFont, "New game here", new Vector2(100,100), Color.White);
 			
 			_spriteBatch.DrawString(gameFont, _graphicsDeviceManager.PreferredBackBufferHeight.ToString(), new Vector2(400,200), Color.White);
 			
 			_spriteBatch.DrawString(gameFont, score.ToString(), new Vector2(0,300), Color.White);
-			
-					
+						
 			_spriteBatch.End();
+			
 			
 			base.Draw(gameTime);
 		}
