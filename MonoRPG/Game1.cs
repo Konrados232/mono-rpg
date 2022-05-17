@@ -32,6 +32,9 @@ namespace MonoRPG
 		
 		public BoardManager BoardManager { get; set; }
 		
+		public InputController InputController { get; set; }
+		
+
 		public Game1()
 		{
 			_graphicsDeviceManager = new GraphicsDeviceManager(this);
@@ -60,7 +63,7 @@ namespace MonoRPG
 						
 			_baseTile = new Tile(baseSprite, new Rectangle(0, 0, 100, 100), Color.White);
 			BoardManager = new BoardManager(20, 20, _baseTile);
-			
+			InputController = new InputController();
 		}
 
 		private bool IsOutsideBounds(Point mousePos) 
@@ -75,6 +78,8 @@ namespace MonoRPG
 			translatedMousePos.X = screenMousePosition.X + cameraOffset.X;
 			translatedMousePos.Y = screenMousePosition.Y + cameraOffset.Y;
 		}
+		
+		bool locked = false;
 		
 		protected override void Update(GameTime gameTime)
 		{
@@ -93,17 +98,19 @@ namespace MonoRPG
 				}
 			}
 			
+			InputController.UpdateInput(mouseState);
 			
-			if (mouseState.LeftButton == ButtonState.Pressed) 
+			if (InputController.IsPressedOnce(MouseInput.LeftButton)) 
 			{
 				score++;
 			}
 			
 			
-			if (Keyboard.GetState().IsKeyDown(Keys.D))
+			if (Keyboard.GetState().IsKeyDown(Keys.D)) 
 			{
 				Camera.MoveCamera(new Vector2(10, 0));
 			}
+		
 			
 			if (Keyboard.GetState().IsKeyDown(Keys.A)) 
 			{
@@ -123,7 +130,6 @@ namespace MonoRPG
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
-			
 
 			base.Update(gameTime);
 		}
