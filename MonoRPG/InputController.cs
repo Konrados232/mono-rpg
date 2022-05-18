@@ -1,40 +1,33 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace MonoRPG
 {	
-	public enum MouseInput
-	{
-		None,
-		LeftButton,
-		MiddleButton,
-		RightButton
-	}
-	
 	public class InputController
 	{
 		public Dictionary<MouseInput, bool> MousePressed { get; set; }
 		public Dictionary<MouseInput, bool> MouseLocked { get; set; }		
 		
 		
-		public InputController() 
+		public InputController()
 		{
 			MousePressed = new Dictionary<MouseInput, bool>();
-			MousePressed.Add(MouseInput.LeftButton, false);
-			MousePressed.Add(MouseInput.MiddleButton, false);
-			MousePressed.Add(MouseInput.RightButton, false);
-			
 			MouseLocked = new Dictionary<MouseInput, bool>();
-			MouseLocked.Add(MouseInput.LeftButton, false);
-			MouseLocked.Add(MouseInput.MiddleButton, false);
-			MouseLocked.Add(MouseInput.RightButton, false);
+			
+			foreach (MouseInput mouseButton in (MouseInput[]) Enum.GetValues(typeof(MouseInput)))
+			{
+				MousePressed.Add(mouseButton, false);
+				MouseLocked.Add(mouseButton, false);
+			}
 		}
 		
 
 		// TO-DO check optimization
 		public void UpdateInput(MouseState mouseState) 
 		{
+			
 			if (mouseState.LeftButton == ButtonState.Pressed) 
 			{
 				MousePressed[MouseInput.LeftButton] = true;
@@ -80,25 +73,6 @@ namespace MonoRPG
 			{
 				return false;
 			}		
-		}
-		
-		/*
-		public bool IsPressedSus(MouseState mouseState) 
-		{
-			if (mouseState.LeftButton == ButtonState.Pressed && !MouseLocked[MouseInput.LeftButton]) 
-			{
-				MouseLocked[MouseInput.LeftButton] = true;
-				return true;
-			}
-			else if (mouseState.LeftButton == ButtonState.Released) 
-			{
-				MouseLocked[MouseInput.LeftButton] = false;
-				return false;
-			}
-			
-			return false;
-		}
-		*/
-		
+		}	
 	}
 }

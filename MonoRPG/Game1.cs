@@ -21,7 +21,7 @@ namespace MonoRPG
 		// fonts
 		SpriteFont gameFont;
 		
-		// 
+		
 		MouseState mouseState;
 		Vector2 translatedMousePos = Vector2.Zero;
 		
@@ -78,9 +78,7 @@ namespace MonoRPG
 			translatedMousePos.X = screenMousePosition.X + cameraOffset.X;
 			translatedMousePos.Y = screenMousePosition.Y + cameraOffset.Y;
 		}
-		
-		bool locked = false;
-		
+				
 		protected override void Update(GameTime gameTime)
 		{
 			mouseState = Mouse.GetState();
@@ -111,7 +109,6 @@ namespace MonoRPG
 				Camera.MoveCamera(new Vector2(10, 0));
 			}
 		
-			
 			if (Keyboard.GetState().IsKeyDown(Keys.A)) 
 			{
 				Camera.MoveCamera(new Vector2(-10, 0));
