@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using System;
+using System.Collections.Generic;
 
 namespace MonoRPG
 {
@@ -33,8 +34,7 @@ namespace MonoRPG
 		public BoardManager BoardManager { get; set; }
 		
 		public InputController InputController { get; set; }
-		
-
+		public InfoBox InfoBox { get; set; }
 		public Game1()
 		{
 			_graphicsDeviceManager = new GraphicsDeviceManager(this);
@@ -53,6 +53,19 @@ namespace MonoRPG
 			base.Initialize();
 		}
 
+		// temporary function for testing
+		private List<InfoString> SeedData() 
+		{
+			var x = new List<InfoString>();
+			x.Add(new InfoString(new Vector2(0, 0), "HP", "100"));
+			x.Add(new InfoString(new Vector2(0, 20), "CanBuild", "Yes"));
+			x.Add(new InfoString(new Vector2(0, 40), "Materials", "Nothing"));
+			x.Add(new InfoString(new Vector2(0, 60), "Great", "Yes"));
+			
+			return x;
+		}
+
+
 		protected override void LoadContent()
 		{
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -64,6 +77,7 @@ namespace MonoRPG
 			_baseTile = new Tile(baseSprite, new Rectangle(0, 0, 100, 100), Color.White);
 			BoardManager = new BoardManager(20, 20, _baseTile);
 			InputController = new InputController();
+			InfoBox = new InfoBox(new Rectangle(0, 0, 200, 250), SeedData(), gameFont);
 		}
 
 		private bool IsOutsideBounds(Point mousePos) 
@@ -93,6 +107,7 @@ namespace MonoRPG
 				if (chosenTile != null)
 				{
 					chosenTile.Color = Color.BlueViolet;
+					InfoBox.IsShown = true;
 				}
 			}
 			
@@ -153,12 +168,23 @@ namespace MonoRPG
 			_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
 								null, null, null, null, null);
 								
+
 			_spriteBatch.DrawString(gameFont, "New game here", new Vector2(100,100), Color.White);
 			
 			_spriteBatch.DrawString(gameFont, _graphicsDeviceManager.PreferredBackBufferHeight.ToString(), new Vector2(400,200), Color.White);
 			
 			_spriteBatch.DrawString(gameFont, score.ToString(), new Vector2(0,300), Color.White);
-						
+			
+			
+			if (InfoBox.IsShown) 
+			{
+				foreach (var info in InfoBox.StringInfo)
+				{
+					_spriteBatch.DrawString(InfoBox.Font, info.FormatString(), info.Position, Color.White);
+				}
+			}
+			
+			
 			_spriteBatch.End();
 			
 			
