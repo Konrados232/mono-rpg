@@ -6,6 +6,7 @@ namespace MonoRPG
 {
 	public class InfoBox
 	{
+		public Vector2 Position { get; set; }
 		public Rectangle Box { get; set; }
 		public bool IsShown { get; set; }
 		public List<InfoString> StringInfo { get; set; }
